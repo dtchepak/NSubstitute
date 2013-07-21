@@ -20,6 +20,7 @@ namespace NSubstitute.Core
 
         public bool HasResultFor(ICall call)
         {
+            // TODO: need to force call base for void methods?
             if (ReturnsVoidFrom(call)) return false;
             return _results.Any(x => x.IsResultFor(call));
         }

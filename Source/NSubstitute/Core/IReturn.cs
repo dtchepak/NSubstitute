@@ -9,6 +9,7 @@ namespace NSubstitute.Core
         object ReturnFor(CallInfo info);
         Type TypeOrNull();
         bool CanBeAssignedTo(Type t);
+        bool IsConstant { get; }
     }
 
     public class ReturnValue : IReturn

@@ -149,7 +149,6 @@ namespace NSubstitute.Acceptance.Specs
             }
 
             [Test]
-            [Ignore("Should/can we avoid call base here?")]
             public void
                 Given_SubstituteForClass_When_VirtualMethodsReturnValueIsOverwritten_Then_ShouldNotCallBaseImplementation
                 ()

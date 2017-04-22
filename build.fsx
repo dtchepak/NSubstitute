@@ -212,29 +212,25 @@ Target "CodeFromDocumentation" <| fun _ ->
     MSBuild null "Build" [ "TargetFrameworkVersion", "v3.5" ] [ outputCodePath + "/samples.csproj" ] |> Log "Build: "
 
 // .NET Core build
-#r @"ThirdParty\FAKE.Dotnet\FAKE.Dotnet\tools\Fake.Dotnet.dll"
-open Fake
-open Fake.Dotnet
-
 Target "InstallDotnetCore" (fun _ ->
-    DotnetCliInstall Preview2ToolingOptions
+    // See .NET Core SDK Version here: https://github.com/dotnet/core/releases
+    // (Note: release .NET Core 1.1.1 is for *SDK version* 1.0.1)
+    DotNetCli.InstallDotNetSDK "1.0.0" |> printfn ".NET Core SDK: %s"
 )
 
 Target "BuildDotNetCore" (fun _ ->
-    !! "Source/NSubstitute/project.json" 
-        |> Seq.iter(fun proj ->  
+    let proj = "Source/NSubstitute/NSubstitute.csproj"
+    // restore project dependencies
+    DotNetCli.Restore (fun p -> { p with Project = proj; NoCache = true })
 
-            // restore project dependencies
-            DotnetRestore id proj
-
-            // build project and produce outputs
-            DotnetCompile (fun c -> 
-                { c with 
-                    Configuration = BuildConfiguration.Custom buildMode;
-                    Framework = Some ("netstandard1.5");
-                    OutputPath = Some (outputBasePath @@ "netstandard1.5" @@ "NSubstitute")
-                }) proj
-        )
+    // build project and produce outputs
+    DotNetCli.Build (fun c -> 
+        { c with 
+            Configuration = buildMode;
+            Project = proj;
+            Framework = "netstandard1.5";
+            Output = outputBasePath @@ "netstandard1.5" @@ "NSubstitute"
+        })
 )
 
 

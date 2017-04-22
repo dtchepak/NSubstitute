@@ -219,15 +219,14 @@ Target "InstallDotnetCore" (fun _ ->
 )
 
 Target "BuildDotNetCore" (fun _ ->
-    let proj = "Source/NSubstitute/NSubstitute.csproj"
     // restore project dependencies
-    DotNetCli.Restore (fun p -> { p with Project = proj; NoCache = true })
+    DotNetCli.Restore (fun p -> { p with NoCache = true })
 
     // build project and produce outputs
     DotNetCli.Build (fun c -> 
         { c with 
+            AdditionalArgs = [ "Source/NSubstitute/project.json" ];
             Configuration = buildMode;
-            Project = proj;
             Framework = "netstandard1.5";
             Output = outputBasePath @@ "netstandard1.5" @@ "NSubstitute"
         })

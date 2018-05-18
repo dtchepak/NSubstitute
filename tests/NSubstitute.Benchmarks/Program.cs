@@ -6,7 +6,8 @@ namespace NSubstitute.Benchmarks
     {
         public static void Main(string[] args)
         {
-            BenchmarkRunner.Run<ActivationBenchmark>();
+            BenchmarkRunner.Run<ArgumentSpecificationUsageBenchmark>();
+            // BenchmarkRunner.Run<ActivationBenchmark>();
             // BenchmarkRunner.Run<DispatchCallBenchmark>();
             // BenchmarkRunner.Run<ToStringCallBenchmark>();
         }

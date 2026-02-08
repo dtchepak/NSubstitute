@@ -98,7 +98,7 @@ Assert.That(formatter.Format(null), Is.Not.EqualTo("matched"));
 _[Since v6.0; .NET6 and above]_ An argument of type `T` can also be conditionally matched using `ArgMatchers.Matching`.
 
 ```csharp
-#if NET6_0_OR_GREATER
+// !!! Requires .NET6 or greater
 
 // With `using static NSubstitute.ArgMatchers`
 calculator.Add(1, -10);
@@ -111,8 +111,6 @@ calculator
     .Add(1, Arg.Is(Matching<int>(x => new[] {-2,-5,-10}.Contains(x))));
 //Did not receive call with first arg greater than 10:
 calculator.DidNotReceive().Add(Arg.Is(Matching<int>(x => x > 10)), -10);
-
-#endif
 ```
 
 

@@ -9,6 +9,7 @@ namespace NSubstitute.Documentation.Tests.Generator;
 public sealed class DocumentationTestsGenerator : IIncrementalGenerator
 {
     private static readonly Regex markdownCodeRegex = new("```(?<tag>\\w+)(?<contents>(?s:.*?))```?");
+    private static readonly Regex requiresPragmaRegex = new("// !!! Requires .NET(?<version>\\d) or greater");
     private static readonly Regex typeOrTestDeclarationRegex = new(@"(\[Test\]|(public |private |protected )?(class |interface )\w+\s*\{)");
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -74,12 +75,18 @@ public sealed class DocumentationTestsGenerator : IIncrementalGenerator
 
         for (int testCaseNumber = 0; testCaseNumber < snippets.Count; testCaseNumber++)
         {
+            var snippet = snippets[testCaseNumber];
+            var requiredVersion = RequiresVersion(snippet);
+            var requiredVersionPragma = requiredVersion != null ? $"#if NET{{requiredVersion}}_0_OR_GREATER" : null;
+            var closeRequiredVersionPragma = requiredVersion != null ? "#endif" : null;
             testClassContent.AppendLine(
                 $$"""
                 [Test]
                 public void Test{{testCaseNumber}}()
                 {
-                    {{snippets[testCaseNumber]}}
+                    {{requiredVersionPragma}}
+                    {{snippet}}
+                    {{closeRequiredVersionPragma}}
                 }
                 """);
         }
@@ -87,6 +94,16 @@ public sealed class DocumentationTestsGenerator : IIncrementalGenerator
         testClassContent.AppendLine("}");
 
         return testClassContent.ToString();
+    }
+
+    private static int? RequiresVersion(string snippet)
+    {
+        var version = requiresPragmaRegex.Match(snippet).Groups["version"]?.Value;
+        if (version == null)
+        {
+            return null;
+        }
+        return int.Parse(version);
     }
 
     private static void ParseMarkdownCodeBlocks(AdditionalText markdownFile, out List<string> declarations, out List<string> snippets)
